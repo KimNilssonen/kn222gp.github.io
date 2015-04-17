@@ -6,11 +6,25 @@ public class DestoyByContact : MonoBehaviour
 	public GameObject EnemyExplosion;
 	public float explosionTime;
 	public GameObject PlayerExplosion;
+	public int scoreValue;
 
 	private int enemyHealth = 2;
 	private int enemy2Health = 6;
+	private GameController gameController;
 
-	private int shipsDestroyed = 0;
+	void Start()
+	{
+		GameObject gameControllerObject = GameObject.FindWithTag ("GameController");
+		if (gameControllerObject != null) 
+		{
+			gameController = gameControllerObject.GetComponent<GameController>();
+		}
+		if (gameController == null) 
+		{
+			Debug.Log ("Cannot find 'GameController' script");
+		}
+	}
+
 
 	// Destroy everything that enters the trigger
 	void OnTriggerEnter2D (Collider2D other) 
@@ -34,13 +48,13 @@ public class DestoyByContact : MonoBehaviour
 
 		} 
 
-
+		// Enemy2Ship. The bigger ships that fires laser.
 		if (gameObject.tag == "Enemy2") 
 		{
 			Destroy (other.gameObject);
 			enemy2Health --;
 
-			if (enemy2Health < 0) 
+			if (enemy2Health == 0) 
 			{
 
 				// If enemy collide, this is the enemy explosion.
@@ -49,11 +63,13 @@ public class DestoyByContact : MonoBehaviour
 						             gameObject.GetComponent<Rigidbody2D> ().position.y), 
                          Quaternion.identity);
 				Destroy (cloneEnemyExplosion, explosionTime);
+				gameController.AddScore(scoreValue);
 
 				Destroy (gameObject);
 			}
 		}
 
+		// Enemy1Ship. Small suicide ships.
 		else 
 		{
 			Destroy (other.gameObject);
@@ -67,32 +83,12 @@ public class DestoyByContact : MonoBehaviour
 										gameObject.GetComponent<Rigidbody2D> ().position.y), 
 	                      Quaternion.identity);
 				Destroy (cloneEnemyExplosion, explosionTime);
+				gameController.AddScore(scoreValue);
 
 				Destroy (gameObject);
-				Counter++;
 
 
 			}
-		}
-	}
-
-	void Update()
-	{
-		Debug.Log (Counter);
-	}
-
-	
-		
-
-	public int Counter
-	{
-		get
-		{
-			return shipsDestroyed;
-		}
-		set
-		{
-			shipsDestroyed = value;
 		}
 	}
 }
